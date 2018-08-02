@@ -1,0 +1,88 @@
+<style type="less">
+.page__title {
+  text-align: center;
+}
+.weui-btn:first-child {
+  margin-top: 60rpx;
+}
+.userinfo-avatar {
+  margin: 0 auto;
+  width: 100rpx;
+  margin-bottom: 30rpx;
+}
+</style>
+<template>
+    <view class="page">
+          <view class="page__hd">
+               <view>
+                    <view  class="userinfo-avatar"><open-data type="userAvatarUrl"></open-data></view>
+                </view>
+                <view class="page__title">全场最佳</view>
+        </view>
+        <view class="weui-cells weui-cells_after-title">
+            <view class="weui-cell weui-cell_input">
+                <view class="weui-cell__hd">
+                    <view class="weui-label">手机号</view>
+                </view>
+                <view class="weui-cell__bd">
+                    <input class="weui-input" name="phone" type="number" maxlength="11" focus="true" bindinput="mobileInput" placeholder="请输入手机号" />
+                </view>
+            </view>
+            <view class="weui-cell weui-cell_input weui-cell_vcode">
+                <view class="weui-cell__hd">
+                    <view class="weui-label">URL</view>
+                </view>
+                <view class="weui-cell__bd">
+                    <input class="weui-input" bindinput="urlInput" placeholder="请输入URL" />
+                </view>
+            </view>
+        </view>
+         <view class="page__bd page__bd_spacing">
+            <button class="weui-btn" type="primary" @tap="lucky">MVP</button>
+        </view>
+    </view>
+</template>
+
+<script>
+import wepy from "wepy";
+import api from "../api/api";
+import tip from "../utils/tip";
+
+export default class Index extends wepy.page {
+  data = {
+    phone: "",
+    url: ""
+  };
+
+  methods = {
+    mobileInput(e) {
+      this.phone = e.detail.value;
+    },
+    urlInput(e) {
+      this.url = e.detail.value;
+    },
+    lucky() {
+      let that = this;
+      that.doLucky();
+    }
+  };
+  async doLucky(currentPage, size) {
+    let that = this;
+    const json = await api.getLucky({
+      query: {
+        phone: that.phone,
+        url: that.url
+      },
+      method: "POST"
+    });
+    if (json.data.success == true) {
+      tip.success("获取全场最佳");
+      that.$apply();
+    } else {
+      tip.error(json.data.message);
+    }
+    that.showLoading = false;
+  }
+  onLoad() {}
+}
+</script>
